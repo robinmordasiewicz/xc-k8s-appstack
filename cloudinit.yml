@@ -15,5 +15,10 @@ write_files:
     path: /root/hello
     permissions: '0755'
 runcmd:
-  - [ wget, "http://slashdot.org", -O, /root/index.html ]
+  - mkdir -p /usr/local/var/run
+  - wget https://github.com/alexgit2k/qemu-guest-agent-static/raw/master/qemu-ga-static-3.1.0-1.x86_64.rpm -O /root/qemu-ga-static-3.1.0-1.x86_64.rpm
+  - cd / && rpm2cpio /root/qemu-ga-static-3.1.0-1.x86_64.rpm | cpio -idmv
+  - ln -s /etc/init.d/qemu-ga /etc/rc3.d/S20qemu-ga
+  - /etc/init.d/qemu-ga start
+
 final_message: "The system is finally up, after $UPTIME seconds"
