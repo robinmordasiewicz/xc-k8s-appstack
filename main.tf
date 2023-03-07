@@ -36,7 +36,7 @@ resource "libvirt_volume" "diskimage" {
 }
 
 resource "libvirt_cloudinit_disk" "cloudinit" {
-  name           = "cloudinit.iso"
+  name           = "xc-cloudinit.iso"
   user_data      = templatefile("${path.module}/cloudinit.yml", {})
   pool           = "default"
 }
@@ -47,6 +47,16 @@ resource "libvirt_domain" "volterradomain" {
   description    = "F5 Distributed Cloud"
   memory         = "16384"
   machine        = "pc-q35-6.2"
+  qemuargs = [
+    [ "-device", "ahci,id=ahci" ],
+    [ "-device", "ide-drive,drive=drive0,bus=ahci.0" ]
+  ]
+
+     -blockdev {"driver":"file","filename":"/var/lib/libvirt/images/xc-cloudinit.iso","node-name":"libvirt-1-storage","auto-read-only":true,"discard":"unmap"}
+     -blockdev {"node-name":"libvirt-1-format","read-only":true,"driver":"raw","file":"libvirt-1-storage"}
+     -device ide-cd,bus=ide.0,drive=libvirt-1-format,id=sata0-0-0
+
+
   xml {
     xslt         = file("machine.xsl")
   }
@@ -58,7 +68,7 @@ resource "libvirt_domain" "volterradomain" {
 #    wait_for_lease = true
   }
  
-#  cloudinit = libvirt_cloudinit_disk.cloudinit.id
+  cloudinit = libvirt_cloudinit_disk.cloudinit.id
 
   cpu {
     mode         = "host-passthrough"
