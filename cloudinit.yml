@@ -2,23 +2,15 @@
 # vim: syntax=yaml
 users:
   - name: vesop
-    gecos: Robin Mordasiewicz
     shell: /bin/bash
-    plain_text_passwd: ubuntu
+    plain_text_passwd: Volterra123
     lock_passwd: false
     no_create_home: true
     no_user_group: true
-write_files:
-  - encoding: gzip
-    content: !!binary |
-        H4sIAIDb/U8C/1NW1E/KzNMvzuBKTc7IV8hIzcnJVyjPL8pJ4QIA6N+MVxsAAAA=
-    path: /root/hello
-    permissions: '0755'
 runcmd:
   - mkdir -p /usr/local/var/run
   - wget https://github.com/alexgit2k/qemu-guest-agent-static/raw/master/qemu-ga-static-3.1.0-1.x86_64.rpm -O /root/qemu-ga-static-3.1.0-1.x86_64.rpm
   - cd / && rpm2cpio /root/qemu-ga-static-3.1.0-1.x86_64.rpm | cpio -idmv
   - ln -s /etc/init.d/qemu-ga /etc/rc3.d/S20qemu-ga
-  - /etc/init.d/qemu-ga start
+  - # /etc/init.d/qemu-ga start
 
-final_message: "The system is finally up, after $UPTIME seconds"

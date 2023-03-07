@@ -10,7 +10,9 @@ terraform {
 variable "hostnames" {
   description    = "Create these hosts"
   type           = list(string)
-  default        = ["mains01", "mains02", "mains03"]
+  #default        = ["mains01", "mains02", "mains03"]
+  #default        = ["mains01"]
+  default        = ["xc-template"]
 }
 
 provider "libvirt" {
@@ -20,13 +22,12 @@ provider "libvirt" {
 resource "libvirt_volume" "volterra" {
   name           = "volterra-qcow2"
   pool           = "default"
-  source         = "/var/lib/libvirt/images/template/volterra.qcow2"
+  source         = "/var/lib/libvirt/images/templates/xc-template.qcow2"
   format         = "qcow2"
 }
 
 resource "libvirt_volume" "diskimage" {
   count          = length(var.hostnames)
-  #name           = format("${var.vm_hostname_prefix}%02d.qcow2", count.index + var.index_start)
   name           = var.hostnames[count.index]
   pool           = "default"
   size           = 107374182400
@@ -45,7 +46,7 @@ resource "libvirt_domain" "volterradomain" {
   name           = var.hostnames[count.index]
   description    = "F5 Distributed Cloud"
   memory         = "16384"
-  #machine        = "pc-q35-6.2"
+  machine        = "pc-q35-6.2"
   xml {
     xslt         = file("machine.xsl")
   }
@@ -57,7 +58,7 @@ resource "libvirt_domain" "volterradomain" {
 #    wait_for_lease = true
   }
  
-  cloudinit = libvirt_cloudinit_disk.cloudinit.id
+#  cloudinit = libvirt_cloudinit_disk.cloudinit.id
 
   cpu {
     mode         = "host-passthrough"
